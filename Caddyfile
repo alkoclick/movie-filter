@@ -1,0 +1,30 @@
+# The Caddyfile is an easy way to configure your Caddy web server.
+#
+# Unless the file starts with a global options block, the first
+# uncommented line is always the address of your site.
+#
+# To use your own domain name (with automatic HTTPS), first make
+# sure your domain's A/AAAA DNS records are properly pointed to
+# this machine's public IP, then replace ":80" below with your
+# domain name.
+
+:80 {
+	# Set this path to your site's directory.
+	root * /srv
+
+	file_server
+
+    handle_path /proxy {
+        rewrite * /programma/
+
+        reverse_proxy https://www.lab111.nl {
+            header_up Host "www.lab111.nl"
+            header_up -Referer
+            header_up -X-Forwarded-*
+            header_up Sec-Fetch-Dest document
+            header_up Sec-Fetch-Mode navigate
+            header_up Sec-Fetch-Site none
+            header_up Sec-Fetch-User "?1"
+        }
+    }
+}
