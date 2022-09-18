@@ -13,10 +13,10 @@ function getFilmsFiltered(proxiedDocument) {
         let link = film.getElementsByTagName("a")[0].getAttribute("href")
         let imgSrc = film.getElementsByTagName("img")[0].getAttribute("src")
 
-        let engels = false
-        for (column of film.getElementsByClassName("col-xs-12")) {
-            if (column.textContent.indexOf("Engels") > 0)
-                engels = true
+        let englishSubsOrOriginal = false
+        for (col of film.getElementsByClassName("col-xs-12")) {
+            if (col.textContent.indexOf("Engels") > 0 || col.textContent.indexOf("geen") > 0)
+                englishSubsOrOriginal = true
         }
         let screenings = Array.from(film.getElementsByClassName("day")).map(e => {
             let timeDate = e.firstElementChild.textContent.substring(3).split(' ')
@@ -29,7 +29,7 @@ function getFilmsFiltered(proxiedDocument) {
             }
         }).filter(s => s.hour24.startsWith("2") || s.hour24.startsWith("19") || s.hour24.startsWith("18"))
 
-        if (engels) {
+        if (englishSubsOrOriginal) {
             filteredFilms.push({
                 title: title,
                 imgSrc: imgSrc,
