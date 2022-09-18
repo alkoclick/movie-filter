@@ -1,5 +1,6 @@
 build-and-publish-head:
   runs-on: ubuntu-latest
+  on: [push]
 
   steps:
     - uses: actions/checkout@v2 # Checking out the repo
