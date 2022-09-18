@@ -5,6 +5,8 @@ function httpGet(theUrl) {
     return xmlHttpReq.responseText;
 }
 
+let monthsInDutch = ["jan", "feb", "maa", "apr", "mei", "jun", "jul", "aug", "sep", "okt", "nov", "dec"]
+
 function getFilmsFiltered(proxiedDocument) {
     let filmdetails = proxiedDocument.getElementsByClassName("row filmdetails")
     let filteredFilms = []
@@ -18,16 +20,17 @@ function getFilmsFiltered(proxiedDocument) {
             if (col.textContent.indexOf("Engels") > 0 || col.textContent.indexOf("geen") > 0)
                 englishSubsOrOriginal = true
         }
+        let thisYear = new Date().getFullYear()
         let screenings = Array.from(film.getElementsByClassName("day")).map(e => {
             let timeDate = e.firstElementChild.textContent.substring(3).split(' ')
+            console.log(timeDate)
             let ticketsLink = e.getElementsByTagName("a")[0]?.getAttribute("href") ?? ""
             return {
-                day: timeDate[0],
-                month: timeDate[1],
-                hour24: timeDate[2],
+                // Yes, this will go bad for a bit around December but c'est la vie
+                date: new Date(thisYear, monthsInDutch.indexOf(timeDate[1]), parseInt(timeDate[0]), parseInt(timeDate[2].split(':')[0]), parseInt(timeDate[2].split(':')[1]), 0, 0),
                 ticketsLink: ticketsLink
             }
-        }).filter(s => s.hour24.startsWith("2") || s.hour24.startsWith("19") || s.hour24.startsWith("18"))
+        }).filter(s => s.date.getHours() >= 18)
 
         if (englishSubsOrOriginal) {
             filteredFilms.push({
@@ -38,7 +41,7 @@ function getFilmsFiltered(proxiedDocument) {
             })
         }
     }
-    return filteredFilms
+    return filteredFilms.sort((filmA, filmB) => Math.min(...filmA.screenings.map(e => e.date.valueOf())) - Math.min(...filmB.screenings.map(e => e.date.valueOf())))
 }
 
 function injectResultsToDom(film) {
@@ -50,10 +53,10 @@ function injectResultsToDom(film) {
     td1a.setAttribute("src", film.imgSrc)
     td1a.setAttribute("loading", "lazy")
     td1a.setAttribute("class", "img-rounded img-responsive poster")
-    td1.setAttribute("class","col-xs-6")
+    td1.setAttribute("class", "col-xs-6")
     td1.appendChild(td1a);
 
-    td2.setAttribute("class","col-xs-6")
+    td2.setAttribute("class", "col-xs-6")
     td2.append(title(film.title, film.link), screeningsContainer(film.screenings))
 
     row.append(td1, td2)
@@ -79,7 +82,7 @@ function screeningsContainer(screenings) {
 
         const button = document.createElement("a")
         button.setAttribute("class", "btn btn-default")
-        button.textContent = `${screening.day} ${screening.month} ${screening.hour24}`
+        button.textContent = dateFormat(screening.date)
         if (screening.ticketsLink !== "")
             button.setAttribute("href", screening.ticketsLink)
         else
@@ -90,6 +93,10 @@ function screeningsContainer(screenings) {
     }
 
     return wrapper
+}
+
+function dateFormat(date) {
+    return `${date.getDate()}/${date.getMonth()+1} ${date.getHours()}:${date.getMinutes()}`
 }
 
 let proxiedDocument = new DOMParser().parseFromString(httpGet('/proxy'), 'text/html')
