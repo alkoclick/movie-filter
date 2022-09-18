@@ -27,4 +27,6 @@
             header_up Sec-Fetch-User "?1"
         }
     }
+
+	header Cache-Control "max-age=0"
 }
