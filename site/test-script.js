@@ -23,7 +23,6 @@ function getFilmsFiltered(proxiedDocument) {
         let thisYear = new Date().getFullYear()
         let screenings = Array.from(film.getElementsByClassName("day")).map(e => {
             let timeDate = e.firstElementChild.textContent.substring(3).split(' ')
-            console.log(timeDate)
             let ticketsLink = e.getElementsByTagName("a")[0]?.getAttribute("href") ?? ""
             return {
                 // Yes, this will go bad for a bit around December but c'est la vie
