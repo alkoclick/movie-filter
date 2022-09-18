@@ -48,9 +48,12 @@ function injectResultsToDom(film) {
     const td2 = document.createElement("td")
 
     td1a.setAttribute("src", film.imgSrc)
-    td1a.setAttribute("class", "img-rounded poster")
+    td1a.setAttribute("loading", "lazy")
+    td1a.setAttribute("class", "img-rounded img-responsive poster")
+    td1.setAttribute("class","col-xs-6")
     td1.appendChild(td1a);
 
+    td2.setAttribute("class","col-xs-6")
     td2.append(title(film.title, film.link), screeningsContainer(film.screenings))
 
     row.append(td1, td2)
@@ -68,7 +71,7 @@ function title(title, link) {
 
 function screeningsContainer(screenings) {
     const wrapper = document.createElement("div")
-    wrapper.setAttribute("class", "container")
+    // wrapper.setAttribute("class", "container")
 
     for (let screening of screenings) {
         const row = document.createElement("div")
